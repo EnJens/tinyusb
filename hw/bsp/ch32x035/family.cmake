@@ -12,7 +12,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/boards/${BOARD}/board.cmake)
 set(CMAKE_SYSTEM_CPU rv32imac-ilp32 CACHE INTERNAL "System Processor")
 set(CMAKE_TOOLCHAIN_FILE ${TOP}/examples/build_system/cmake/toolchain/riscv_${TOOLCHAIN}.cmake)
 
-set(FAMILY_MCUS CH32V20X CACHE INTERNAL "")
+set(FAMILY_MCUS CH32X035 CACHE INTERNAL "")
 set(OPENOCD_OPTION "-f ${CMAKE_CURRENT_LIST_DIR}/wch-riscv.cfg")
 
 # Port0 use FSDev, Port1 use USBFS
@@ -35,7 +35,7 @@ function(add_board_target BOARD_TARGET)
   set(LD_FILE_Clang ${LD_FILE_GNU})
 
   if (NOT DEFINED STARTUP_FILE_GNU)
-    set(STARTUP_FILE_GNU ${SDK_SRC_DIR}/Startup/startup_${CH32_FAMILY}_${MCU_VARIANT}.S)
+    set(STARTUP_FILE_GNU ${SDK_SRC_DIR}/Startup/startup_${CH32_FAMILY}.S)
   endif ()
   set(STARTUP_FILE_Clang ${STARTUP_FILE_GNU})
 
@@ -124,7 +124,7 @@ function(family_configure_example TARGET RTOS)
 
   target_sources(${TARGET} PUBLIC
     ${TOP}/src/portable/wch/dcd_ch32_usbfs.c
-    ${TOP}/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
+#    ${TOP}/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c
     )
   target_link_libraries(${TARGET} PUBLIC board_${BOARD})
 
