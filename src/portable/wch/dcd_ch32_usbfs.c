@@ -35,11 +35,17 @@
 /* private defines */
 #define EP_MAX (8)
 
+#if CFG_TUSB_MCU == OPT_MCU_CH32X035
+#define EP_DMA(ep)     ((&USBOTG_FS->UEP0_DMA)[ep + (ep > 4 ? 12 : 0)])
+#define EP_TX_LEN(ep)  ((&USBOTG_FS->UEP0_TX_LEN)[2 * ep + (ep > 4 ? 24 : 0)])
+#define EP_TX_CTRL(ep) ((&USBOTG_FS->UEP0_CTRL_H)[2 * ep + (ep > 4 ? 24 : 0)])
+#define EP_RX_CTRL(ep) ((&USBOTG_FS->UEP0_CTRL_H)[2 * ep + (ep > 4 ? 24 : 0)])
+#else
 #define EP_DMA(ep)     ((&USBOTG_FS->UEP0_DMA)[ep])
 #define EP_TX_LEN(ep)  ((&USBOTG_FS->UEP0_TX_LEN)[2 * ep])
 #define EP_TX_CTRL(ep) ((&USBOTG_FS->UEP0_TX_CTRL)[4 * ep])
 #define EP_RX_CTRL(ep) ((&USBOTG_FS->UEP0_RX_CTRL)[4 * ep])
-
+#endif
 /* private data */
 struct usb_xfer {
   bool valid;
@@ -142,11 +148,20 @@ bool dcd_init(uint8_t rhport, const tusb_rhport_init_t* rh_init) {
   // enable other endpoints but NAK everything
   USBOTG_FS->UEP4_1_MOD = 0xCC;
   USBOTG_FS->UEP2_3_MOD = 0xCC;
+#if CFG_TUSB_MCU == OPT_MCU_CH32X035
+  USBFSD->UEP567_MOD = 0x3C;
+#else
   USBOTG_FS->UEP5_6_MOD = 0xCC;
   USBOTG_FS->UEP7_MOD = 0x0C;
-
+#endif
   for (uint8_t ep = 1; ep < EP_MAX; ep++) {
+#if CFG_TUSB_MCU == OPT_MCU_CH32X035
+    if (ep != 4) {
+      EP_DMA(ep) = (uint32_t) &data.buffer[ep][0];
+    }
+#else
     EP_DMA(ep) = (uint32_t) &data.buffer[ep][0];
+#endif
     EP_TX_LEN(ep) = 0;
     EP_TX_CTRL(ep) = USBFS_EP_T_AUTO_TOG | USBFS_EP_T_RES_NAK;
     EP_RX_CTRL(ep) = USBFS_EP_R_AUTO_TOG | USBFS_EP_R_RES_NAK;

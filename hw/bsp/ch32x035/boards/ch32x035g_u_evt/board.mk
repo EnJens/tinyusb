@@ -1,0 +1,9 @@
+MCU_VARIANT = ""
+
+CFLAGS += \
+  -DSYSCLK_FREQ_48MHz_HSI=48000000 \
+	-DCH32_FLASH_ENHANCE_READ_MODE=1 \
+
+LDFLAGS += \
+  -Wl,--defsym=__FLASH_SIZE=62K \
+  -Wl,--defsym=__RAM_SIZE=20K \
