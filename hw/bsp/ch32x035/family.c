@@ -20,20 +20,12 @@ manufacturer: WCH
 #include "bsp/board_api.h"
 #include "board.h"
 
-/* CH32v203 depending on variants can support 2 USB IPs: FSDEV and USBFS.
- * By default, we use FSDEV, but you can explicitly select by define:
- * - CFG_TUD_WCH_USBIP_FSDEV
- * - CFG_TUD_WCH_USBIP_USBFS
- */
-
-// USBFS
 __attribute__((interrupt)) __attribute__((used))
 void USBFS_IRQHandler(void) {
   #if CFG_TUD_WCH_USBIP_USBFS
   tud_int_handler(0);
   #endif
 }
-
 
 
 __attribute__((interrupt)) __attribute__((used))
@@ -119,7 +111,6 @@ void board_init(void) {
   };
   USART_Init(UART_DEV, &usart);
   USART_Cmd(UART_DEV, ENABLE);
-  board_uart_write("UART init done\r\n", sizeof("UART init done\r\n"));
 #endif
 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
